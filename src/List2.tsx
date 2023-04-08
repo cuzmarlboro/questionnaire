@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import type { FC } from "react";
+import produce from "immer";
 import QuestionCard from "./components/QuestionCard";
 
 const List2: FC = () => {
@@ -13,10 +14,18 @@ const List2: FC = () => {
 
 	// 发布问卷
 	const publishQuestion = (id: string) => {
+		// setQuestionList(
+		// 	questionList.map((q) => {
+		// 		if (q.id !== id) return q;
+		// 		return { ...q, isPublished: true };
+		// 	})
+		// );
+
+		// immer 方式
 		setQuestionList(
-			questionList.map((q) => {
-				if (q.id !== id) return q;
-				return { ...q, isPublished: true };
+			produce((draft) => {
+				const index = questionList.findIndex((q) => q.id === id);
+				draft[index].isPublished = true;
 			})
 		);
 	};
@@ -24,12 +33,27 @@ const List2: FC = () => {
 	// 新增问卷
 	const add = () => {
 		const r = questionList.length + 1;
-		setQuestionList(questionList.concat({ id: `q${r}`, title: `问卷${r}`, isPublished: false }));
+		// setQuestionList(questionList.concat({ id: `q${r}`, title: `问卷${r}`, isPublished: false }));
+
+		// immer 方式
+		setQuestionList(
+			produce((draft) => {
+				draft.push({ id: `q${r}`, title: `问卷${r}`, isPublished: false });
+			})
+		);
 	};
 
 	// 删除问卷
 	const deleteQuestion = (id: string) => {
-		setQuestionList(questionList.filter((q) => q.id !== id));
+		// setQuestionList(questionList.filter((q) => q.id !== id));
+
+		// immer 方式
+		setQuestionList(
+			produce((draft) => {
+				const index = draft.findIndex((q) => q.id === id);
+				draft.splice(index, 1);
+			})
+		);
 	};
 
 	return (
